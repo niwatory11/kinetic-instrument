@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens. Single source of truth for the "Kinetic Instrument" theme:
+   near-black cool ink, one amber accent (instrument-panel glow), sharp corners.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #0a0d12;
+  --color-surface: #10141b;
+  --color-line: rgba(233, 236, 241, 0.12);
+  --color-fg: #e9ecf1;
+  --color-muted: #99a2b1;
+  --color-accent: #f5a93f;
+  --color-ember: #ff5f3c;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Wide-stretch display setting for Archivo's variable width axis. */
+@utility display-wide {
+  font-stretch: 125%;
+}
+
+html {
+  overflow-x: clip;
+}
+
+/* Native smooth anchors only when Lenis is not driving the scroll. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.lenis) {
+    scroll-behavior: smooth;
   }
 }
 
+/* Lenis recommended base styles. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-fg);
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(245, 169, 63, 0.28);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Reduced motion: collapse every CSS transition/animation to near-instant.
+   JS-driven motion (Lenis, GSAP, 3D loop) is disabled separately in code. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
