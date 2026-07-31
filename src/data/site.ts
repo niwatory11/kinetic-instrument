@@ -1,6 +1,6 @@
 /*
- * All visible copy lives here so the placeholder identity and the sample
- * works can be swapped for real content without touching components.
+ * All visible copy lives here so identity and the sample works can be
+ * updated without touching components.
  */
 
 export const site = {
@@ -28,15 +28,11 @@ export const site = {
   },
   contact: {
     heading: "Have a project in mind?",
-    body: "Tell me about the idea, the deadline and the ambition. I usually reply within two days.",
-    cta: "Email me",
-    /* TODO: replace with a real inbox before publishing. */
-    email: "hello@niwatory.dev",
-    socials: [
-      { label: "GitHub", href: "https://github.com/niwatory" },
-      { label: "X", href: "https://x.com/niwatory" },
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/niwatory" },
-    ],
+    body: "Tell me about the idea, the deadline and the ambition — GitHub is the best place to reach me.",
+    cta: "Find me on GitHub",
+    /* Public profile instead of a mailbox: nothing personal to expose,
+       and the link can never go stale the way an unowned domain could. */
+    ctaHref: "https://github.com/niwatory11",
   },
   footer: {
     note: "The projects on this page are fictional sample concepts, built to demonstrate layout, motion and WebGL — not real client engagements.",

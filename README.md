@@ -2,7 +2,7 @@
 
 A production-quality single-page portfolio with an interactive 3D hero built **entirely from Three.js primitives and shaders**. No external 3D models (GLB/GLTF/OBJ) are loaded; the hero object is generated in code.
 
-All identity and works content is placeholder: "Taro Yamada" is a stand-in name and every listed project is a fictional **Sample Project**.
+Every listed project is a fictional **Sample Project** built to demonstrate layout, motion and WebGL — not a real client engagement.
 
 ## Getting started
 
