@@ -93,6 +93,72 @@ const CORE_FRAGMENT = /* glsl */ `
   }
 `;
 
+/* Additive rim-glow shell. Fakes a bloom halo around the core WITHOUT any
+   postprocessing pass: a slightly larger sphere whose fragments brighten
+   toward the silhouette edge (fresnel), blended additively over the scene. */
+const GLOW_VERTEX = /* glsl */ `
+  varying vec3 vN;
+  varying vec3 vView;
+  void main() {
+    vec4 world = modelMatrix * vec4(position, 1.0);
+    vN = normalize(mat3(modelMatrix) * normal);
+    vView = normalize(cameraPosition - world.xyz);
+    gl_Position = projectionMatrix * viewMatrix * world;
+  }
+`;
+
+const GLOW_FRAGMENT = /* glsl */ `
+  uniform float uProgress;
+  uniform vec3 uColorA;
+  uniform vec3 uColorB;
+  varying vec3 vN;
+  varying vec3 vView;
+  void main() {
+    float rim = pow(1.0 - clamp(dot(normalize(vN), normalize(vView)), 0.0, 1.0), 3.0);
+    vec3 col = mix(uColorA, uColorB, smoothstep(0.1, 0.9, uProgress));
+    gl_FragColor = vec4(col, rim * 0.85);
+  }
+`;
+
+/* Spherical-shell point cloud: instrument "dust"/reference bearings drifting
+   around the assembly. Deterministic golden-angle spiral so the field reads
+   as ordered, not noisy (fits the precision-instrument language). */
+function buildShellPoints(count: number, rMin: number, rMax: number): Float32Array {
+  const positions = new Float32Array(count * 3);
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < count; i++) {
+    const t = (i + 0.5) / count;
+    const y = 1 - t * 2; // 1 -> -1
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = golden * i;
+    const radius = rMin + (rMax - rMin) * ((i * 97) % 100) / 100;
+    positions[i * 3] = Math.cos(theta) * r * radius;
+    positions[i * 3 + 1] = y * radius;
+    positions[i * 3 + 2] = Math.sin(theta) * r * radius;
+  }
+  return positions;
+}
+
+/* Flat graduated dial (protractor ticks) sitting behind the instrument.
+   Every 5th tick is a major (longer) graduation. Pure line segments. */
+function buildDial(radius: number, ticks: number): Float32Array {
+  const positions = new Float32Array(ticks * 2 * 3);
+  for (let i = 0; i < ticks; i++) {
+    const angle = (i / ticks) * Math.PI * 2;
+    const major = i % 5 === 0;
+    const inner = radius - (major ? 0.12 : 0.05);
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    positions[i * 6] = c * inner;
+    positions[i * 6 + 1] = s * inner;
+    positions[i * 6 + 2] = 0;
+    positions[i * 6 + 3] = c * radius;
+    positions[i * 6 + 4] = s * radius;
+    positions[i * 6 + 5] = 0;
+  }
+  return positions;
+}
+
 const smoothstep01 = (p: number) => p * p * (3 - 2 * p);
 
 export default function HeroObject({
@@ -108,17 +174,38 @@ export default function HeroObject({
   const spinRefs = useRef<(THREE.Mesh | null)[]>([]);
   const satelliteRef = useRef<THREE.Group>(null);
   const coreMatRef = useRef<THREE.ShaderMaterial>(null);
+  const glowMatRef = useRef<THREE.ShaderMaterial>(null);
+  const pointsRef = useRef<THREE.Points>(null);
+  const cageRef = useRef<THREE.Group>(null);
 
   /* Geometry budget: ~15k vertices desktop, ~7k on mobile. */
   const segments = compact
     ? { ringRadial: 10, ringTubular: 96, coreDetail: 1 }
     : { ringRadial: 16, ringTubular: 160, coreDetail: 1 };
 
+  /* Instrument "dust" field + graduated dial, sized down on mobile. */
+  const shellPositions = useMemo(
+    () => buildShellPoints(compact ? 180 : 420, 2.1, 3.2),
+    [compact],
+  );
+  const dialPositions = useMemo(() => buildDial(1.95, compact ? 48 : 72), [compact]);
+
   /* Stable uniforms object; mutated per-frame through coreMatRef (the
      sanctioned ref escape hatch, keeps react-hooks/immutability happy). */
   const coreUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
+      uProgress: { value: 0 },
+      uColorA: { value: new THREE.Color("#f5a93f") },
+      uColorB: { value: new THREE.Color("#ff5f3c") },
+    }),
+    [],
+  );
+
+  /* Separate uniforms object for the additive glow shell (same amber->ember
+     progress mapping as the core so halo and core stay chromatically locked). */
+  const glowUniforms = useMemo(
+    () => ({
       uProgress: { value: 0 },
       uColorA: { value: new THREE.Color("#f5a93f") },
       uColorB: { value: new THREE.Color("#ff5f3c") },
@@ -135,6 +222,8 @@ export default function HeroObject({
 
     const coreMat = coreMatRef.current;
     if (coreMat) coreMat.uniforms.uProgress.value = eased;
+    const glowMat = glowMatRef.current;
+    if (glowMat) glowMat.uniforms.uProgress.value = eased;
 
     const group = groupRef.current;
     if (!group) return;
@@ -170,6 +259,15 @@ export default function HeroObject({
     /* Two bearings orbiting in the outer ring's plane. */
     const satellites = satelliteRef.current;
     if (satellites) satellites.rotation.z = t * 0.42;
+
+    /* Ambient layers drift on their own axes for parallax depth. */
+    const points = pointsRef.current;
+    if (points) points.rotation.y = t * 0.04;
+    const cage = cageRef.current;
+    if (cage) {
+      cage.rotation.y = -t * 0.06;
+      cage.rotation.x = 0.2 + eased * 0.35;
+    }
   });
 
   return (
@@ -187,6 +285,21 @@ export default function HeroObject({
           vertexShader={CORE_VERTEX}
           fragmentShader={CORE_FRAGMENT}
           uniforms={coreUniforms}
+        />
+      </mesh>
+
+      {/* Fake-bloom halo: additive rim glow, hue-locked to the core. No
+          postprocessing pass — just a larger sphere blended additively. */}
+      <mesh scale={1.6}>
+        <icosahedronGeometry args={[0.58, 2]} />
+        <shaderMaterial
+          ref={glowMatRef}
+          vertexShader={GLOW_VERTEX}
+          fragmentShader={GLOW_FRAGMENT}
+          uniforms={glowUniforms}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
 
@@ -211,9 +324,9 @@ export default function HeroObject({
               <meshStandardMaterial
                 color="#f5a93f"
                 emissive="#f5a93f"
-                emissiveIntensity={0.55}
+                emissiveIntensity={1.15}
                 metalness={0.4}
-                roughness={0.35}
+                roughness={0.3}
               />
             ) : (
               <meshStandardMaterial color="#39404d" metalness={0.92} roughness={0.26} />
@@ -228,14 +341,56 @@ export default function HeroObject({
                   key={angle}
                   position={[Math.cos(angle) * ring.radius, Math.sin(angle) * ring.radius, 0]}
                 >
-                  <sphereGeometry args={[0.05, 16, 16]} />
-                  <meshStandardMaterial color="#e9ecf1" metalness={0.85} roughness={0.2} />
+                  <sphereGeometry args={[0.055, 16, 16]} />
+                  <meshStandardMaterial
+                    color="#ffd9a0"
+                    emissive="#f5a93f"
+                    emissiveIntensity={0.9}
+                    metalness={0.6}
+                    roughness={0.25}
+                  />
                 </mesh>
               ))}
             </group>
           )}
         </group>
       ))}
+
+      {/* Graduated dial behind the assembly: protractor ticks in the accent
+          hue, every 5th one a longer major graduation. Pure line segments. */}
+      <group rotation={[Math.PI / 2.3, 0, 0]} position={[0, 0, -0.15]}>
+        <lineSegments>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[dialPositions, 3]} />
+          </bufferGeometry>
+          <lineBasicMaterial color="#f5a93f" transparent opacity={0.24} />
+        </lineSegments>
+      </group>
+
+      {/* Reference frame: faint wireframe cage the instrument sits inside,
+          counter-rotating for parallax. */}
+      <group ref={cageRef}>
+        <mesh>
+          <icosahedronGeometry args={[2.4, 1]} />
+          <meshBasicMaterial color="#5f7cff" wireframe transparent opacity={0.07} />
+        </mesh>
+      </group>
+
+      {/* Instrument dust: ordered golden-angle point field for atmosphere. */}
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[shellPositions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#e9ecf1"
+          size={0.02}
+          sizeAttenuation
+          transparent
+          opacity={0.5}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
     </group>
   );
 }

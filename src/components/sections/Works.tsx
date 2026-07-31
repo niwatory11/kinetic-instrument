@@ -1,4 +1,3 @@
-import { site } from "../../data/site";
 import { works } from "../../data/site";
 
 /*
@@ -56,7 +55,7 @@ export default function Works() {
         </div>
 
         <p data-reveal className="mt-8 text-xs text-muted">
-          {site.name} is a placeholder identity; the projects above illustrate layout and
+          Fictional sample concepts — the projects above illustrate layout, motion and
           interaction only.
         </p>
       </div>

@@ -21,9 +21,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Taro Yamada | Creative Developer",
+  title: "niwatory | Creative Developer",
   description:
-    "Sample portfolio of a creative developer: interactive 3D, WebGL and motion-driven interfaces. All listed works are fictional sample projects.",
+    "Portfolio of niwatory, a creative developer building interactive 3D, WebGL and motion-driven interfaces. Listed works are fictional sample concepts.",
 };
 
 export default function RootLayout({

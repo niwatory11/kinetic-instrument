@@ -4,12 +4,15 @@
  */
 
 export const site = {
-  /* Placeholder identity. Replace with the real name before publishing. */
-  name: "Taro Yamada",
-  nameLines: ["Taro", "Yamada"],
+  name: "niwatory",
+  /* One entry per display line; the hero renders each line letter-by-letter
+     (kinetic reveal), so any number of lines works. */
+  nameLines: ["niwatory"],
   role: "Creative Developer",
+  /* Instrument-style call sign shown as a micro label under the hero wordmark. */
+  callSign: "N-01 / KINETIC INSTRUMENT",
   heroLead:
-    "Creative developer crafting interactive 3D scenes and precise, motion-driven interfaces for the web.",
+    "Creative developer engineering interactive 3D scenes and precise, motion-driven interfaces for the web.",
   heroCta: "View Selected Works",
   about: {
     heading: "About",
@@ -27,16 +30,16 @@ export const site = {
     heading: "Have a project in mind?",
     body: "Tell me about the idea, the deadline and the ambition. I usually reply within two days.",
     cta: "Email me",
-    /* .example domain on purpose: this is a placeholder address. */
-    email: "hello@taroyamada.example",
+    /* TODO: replace with a real inbox before publishing. */
+    email: "hello@niwatory.dev",
     socials: [
-      { label: "GitHub", href: "https://github.com/username-placeholder" },
-      { label: "X", href: "https://x.com/username-placeholder" },
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/username-placeholder" },
+      { label: "GitHub", href: "https://github.com/niwatory" },
+      { label: "X", href: "https://x.com/niwatory" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/niwatory" },
     ],
   },
   footer: {
-    note: "Placeholder identity. Every project listed on this page is a fictional sample, not a real client engagement.",
+    note: "The projects on this page are fictional sample concepts, built to demonstrate layout, motion and WebGL — not real client engagements.",
     credit: "Built with Next.js, React Three Fiber, GSAP and Lenis.",
   },
 } as const;
