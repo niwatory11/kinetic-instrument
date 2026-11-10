@@ -9,7 +9,7 @@ const heroName = site.nameLines.join(" ");
  * The name is split per letter so MotionOrchestrator can run the kinetic
  * reveal: every line is its own overflow-hidden mask the letters rise out of,
  * and every letter is inline-block so transforms apply.
- * Max 5 text elements: role, name, call sign, lead, CTA.
+ * Text elements: role, name, call sign, lead, CTA pair (works + contact).
  */
 export default function Hero() {
   return (
@@ -55,16 +55,23 @@ export default function Hero() {
         </p>
         <p
           data-hero-fade
-          className="mt-7 max-w-md text-base leading-relaxed text-muted sm:text-lg"
+          className="mt-7 max-w-[25em] text-[15px] leading-[1.95] text-fg/80 sm:text-[17px]"
         >
           {site.heroLead}
         </p>
-        <div data-hero-fade className="mt-10">
+        <div data-hero-fade className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
           <a
             href="#works"
-            className="inline-flex items-center gap-3 bg-accent px-7 py-4 font-mono text-[13px] font-medium uppercase tracking-[0.16em] text-ink transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
+            className="inline-flex items-center gap-3 bg-accent px-7 py-4 text-[15px] font-bold text-ink transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
           >
             {site.heroCta}
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 border-b border-line py-1 text-[15px] text-fg/85 transition-colors hover:border-accent hover:text-accent"
+          >
+            {site.heroSubCta}
             <span aria-hidden="true">&rarr;</span>
           </a>
         </div>

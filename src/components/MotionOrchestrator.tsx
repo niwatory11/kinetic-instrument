@@ -91,9 +91,32 @@ export default function MotionOrchestrator() {
         }),
       );
 
+      /*
+       * Process track: the accent fill grows along the hairline as the
+       * steps scroll through the viewport (scrubbed, so it reads as a gauge
+       * needle rather than a one-off reveal). Axis comes from the element:
+       * "x" on lg+ (horizontal track), "y" below (vertical track).
+       */
+      const fillTweens = gsap.utils.toArray<HTMLElement>("[data-process-fill]").map((el) =>
+        gsap.from(el, {
+          [el.dataset.processFill === "x" ? "scaleX" : "scaleY"]: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: el.closest("[data-process]") ?? el,
+            start: "top 75%",
+            end: "bottom 60%",
+            scrub: 0.6,
+          },
+        }),
+      );
+
       return () => {
         letterTween?.kill();
         heroTween.kill();
+        fillTweens.forEach((tween) => {
+          tween.scrollTrigger?.kill();
+          tween.kill();
+        });
         revealTweens.forEach((tween) => {
           tween.scrollTrigger?.kill();
           tween.kill();

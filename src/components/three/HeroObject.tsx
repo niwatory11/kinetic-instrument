@@ -242,9 +242,11 @@ export default function HeroObject({
     group.rotation.x = THREE.MathUtils.damp(group.rotation.x, targetX, 3, delta);
     group.rotation.y = THREE.MathUtils.damp(group.rotation.y, targetY, 3, delta);
 
-    /* Slow float + slight drift toward center as the page is scrolled. */
-    group.position.y = Math.sin(t * 0.5) * 0.07 - eased * 0.15;
-    group.position.x = baseX * (1 - eased * 0.45);
+    /* Slow float, then by the closing CTA the instrument clears the copy:
+       on desktop it drifts further right, on phones (centered, under the
+       text column) it sinks below the contact copy. */
+    group.position.y = Math.sin(t * 0.5) * 0.07 - eased * (compact ? 1.05 : 0.15);
+    group.position.x = baseX * (1 + eased * 0.32);
 
     RINGS.forEach((ring, i) => {
       const tilt = tiltRefs.current[i];

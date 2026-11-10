@@ -107,6 +107,9 @@ export default function HeroCanvas() {
       {/* Left scrim + vignette: keeps DOM text readable over the 3D scene. */}
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,13,18,0.88)_0%,rgba(10,13,18,0.45)_42%,rgba(10,13,18,0.1)_72%,rgba(10,13,18,0.35)_100%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(10,13,18,0.65)_100%)]" />
+      {/* Phones: the instrument sits centered under the text column, so a
+          flat ink layer keeps body copy readable over the rings. */}
+      <div className="absolute inset-0 bg-ink/45 md:hidden" />
     </div>
   );
 }

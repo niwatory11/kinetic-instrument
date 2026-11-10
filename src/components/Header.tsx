@@ -1,9 +1,10 @@
 import { site } from "../data/site";
 
 const NAV = [
-  { label: "Works", href: "#works" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "実績", href: "#works" },
+  { label: "できること", href: "#services" },
+  { label: "流れ", href: "#process" },
+  { label: "相談", href: "#contact" },
 ];
 
 export default function Header() {
@@ -16,13 +17,13 @@ export default function Header() {
         >
           {site.name}
         </a>
-        <nav aria-label="Primary">
+        <nav aria-label="メイン">
           <ul className="flex items-center gap-4 sm:gap-8">
             {NAV.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
-                  className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted transition-colors hover:text-accent sm:text-[13px] sm:tracking-[0.14em]"
+                  className="inline-block py-3 text-xs text-fg/75 transition-colors hover:text-accent sm:text-sm"
                 >
                   {item.label}
                 </a>

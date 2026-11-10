@@ -1,8 +1,10 @@
 # Kinetic Instrument Portfolio
 
-A production-quality single-page portfolio with an interactive 3D hero built **entirely from Three.js primitives and shaders**. No external 3D models (GLB/GLTF/OBJ) are loaded; the hero object is generated in code.
+niwatory のポートフォリオ（日本語）。1ページの中に、制作実績・できること・ご依頼の流れ・自己紹介・連絡先を置いています。ヒーローの3Dは **Three.js のプリミティブとシェーダーだけ**で作っており、外部の3Dモデル（GLB/GLTF/OBJ）は読み込みません。
 
-Every listed project is a fictional **Sample Project** built to demonstrate layout, motion and WebGL — not a real client engagement.
+制作実績に載せているのは、実際に作って公開している4作品（菓寮 月白・常盤精工・湯宿 山霞・NAGINO都市環境技研）です。いずれも架空のブランドを題材にした自主制作で、実在の企業・店舗とは関係ありません。
+
+実績カードのスクリーンショット（`src/assets/works/*.webp`）は、各サイトの1画面目を PC 幅（1440×900）とスマホ幅（390×844）で撮り、webp（品質80）にしたものです。各サイトの見た目を変えたら撮り直してください。
 
 ## Getting started
 
@@ -29,7 +31,7 @@ One idea runs through shape, color and motion: a **kinetic instrument**.
 - **Shape**: an armillary-sphere-like assembly of torus rings (the outer one deliberately broken into an arc) around a faceted icosahedron core. Precise and mechanical, not an abstract blob.
 - **Color**: near-black cool ink (`#0a0d12`) with a single amber accent (`#f5a93f`), the glow of an instrument panel. The core's fresnel rim shifts amber to ember as you scroll.
 - **Motion**: constant angular velocities for the rings, heavy damped pointer-follow for the whole assembly, restrained fade/rise reveals for text. Nothing bounces.
-- **Type**: Archivo (variable width axis, wide display cut) + IBM Plex Mono for micro labels. Sharp corners everywhere (radius 0).
+- **Type**: IBM Plex Sans JP（日本語の本文・見出し）+ Archivo（幅の広いロゴ・ワードマークだけ）+ IBM Plex Mono（小さなラベル）。日本語は `word-break: auto-phrase` で文節の切れ目で折り返す。角は基本 0（スマホの枠だけ丸める）。
 
 ## Architecture
 
@@ -42,7 +44,8 @@ src/
   components/
     MotionOrchestrator.tsx  Lenis + GSAP/ScrollTrigger sync, all page motion
     Header.tsx
-    sections/               Hero / About / Works / Contact / Footer
+    SectionHeading.tsx      各セクションの見出し（番号・ラベル・見出し・リード）
+    sections/               Hero / Works / Services / Process / About / Contact / Footer
     three/
       HeroCanvas.tsx        fixed background Canvas, lights, scrims, dpr caps
       HeroObject.tsx        the single swappable 3D subject
@@ -86,6 +89,6 @@ Add `useGLTF.preload("/models/hero.glb")` at module scope and place the file in 
 
 ## Content swap checklist
 
-1. `src/data/site.ts`: name, role, about, tags, contact email and socials.
-2. `works` in the same file: replace the CSS `pattern` fields with real `<Image>` art per project and remove the "Sample Project" labels once projects are real.
-3. `src/app/layout.tsx`: metadata title/description.
+1. `src/data/site.ts`: 名前・紹介文・道具・連絡先、`works`（実績）・`services`（できること）・`steps`（ご依頼の流れ）。
+2. 実績の画像は `src/assets/works/` に置き、`site.ts` で静的 import する（basePath が自動で付く）。
+3. `src/app/layout.tsx`: metadata の title/description。

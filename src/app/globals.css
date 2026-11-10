@@ -12,16 +12,33 @@
   --color-muted: #99a2b1;
   --color-accent: #f5a93f;
   --color-ember: #ff5f3c;
+  /* Phone bezel around the mobile screenshots in Works. */
+  --color-bezel: #1c222c;
 }
 
 @theme inline {
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex-jp), "Hiragino Sans", "Yu Gothic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
-/* Wide-stretch display setting for Archivo's variable width axis. */
+/* Wide display cut: Archivo on its variable width axis (wordmark only). */
 @utility display-wide {
+  font-family: var(--font-display);
   font-stretch: 125%;
+}
+
+/* Ink veil behind the content between hero and contact: fades in over the
+   first 24vh and out over the last 50vh, so the fixed 3D instrument recedes
+   behind screenshots and copy, then returns for the closing CTA. */
+@utility veil {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    color-mix(in srgb, var(--color-ink) 92%, transparent) 24vh,
+    color-mix(in srgb, var(--color-ink) 92%, transparent) calc(100% - 50vh),
+    transparent 100%
+  );
 }
 
 html {
@@ -48,6 +65,29 @@ body {
   background: var(--color-ink);
   color: var(--color-fg);
   overflow-x: clip;
+  letter-spacing: 0.02em;
+}
+
+/* Japanese line breaking: wrap at phrase boundaries (Chrome 119+) and avoid
+   a lone character such as 「す。」 on the last line. Older browsers ignore
+   both and fall back to normal breaking. */
+:lang(ja) {
+  line-break: strict;
+}
+h1,
+h2,
+h3,
+p,
+li {
+  word-break: auto-phrase;
+}
+h2,
+h3 {
+  text-wrap: balance;
+}
+p,
+li {
+  text-wrap: pretty;
 }
 
 ::selection {
