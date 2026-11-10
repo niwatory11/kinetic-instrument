@@ -22,7 +22,9 @@ export default function About() {
 
           <div data-reveal>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">Toolset</p>
-            <ul className="mt-4 grid grid-cols-1 border-l border-t border-line sm:grid-cols-2">
+            {/* Solid plate: this list sits where the veil fades out, so
+                without it the rings pass behind the labels. */}
+            <ul className="mt-4 grid grid-cols-1 border-l border-t border-line bg-ink/85 sm:grid-cols-2">
               {site.about.tags.map((tag) => (
                 <li
                   key={tag}

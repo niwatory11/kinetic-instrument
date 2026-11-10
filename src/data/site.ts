@@ -1,12 +1,16 @@
 import type { StaticImageData } from "next/image";
 import karioDesktop from "../assets/works/kario-tsukishiro-desktop.webp";
 import karioMobile from "../assets/works/kario-tsukishiro-mobile.webp";
+import karioDetail from "../assets/works/kario-tsukishiro-detail.webp";
 import tokiwaDesktop from "../assets/works/tokiwa-seiko-desktop.webp";
 import tokiwaMobile from "../assets/works/tokiwa-seiko-mobile.webp";
+import tokiwaDetail from "../assets/works/tokiwa-seiko-detail.webp";
 import yuyadoDesktop from "../assets/works/yuyado-yamagasumi-photo-desktop.webp";
 import yuyadoMobile from "../assets/works/yuyado-yamagasumi-photo-mobile.webp";
+import yuyadoDetail from "../assets/works/yuyado-yamagasumi-photo-detail.webp";
 import naginoDesktop from "../assets/works/nagino-desktop.webp";
 import naginoMobile from "../assets/works/nagino-mobile.webp";
+import naginoDetail from "../assets/works/nagino-detail.webp";
 
 /*
  * All visible copy lives here so identity, works, services and the process
@@ -26,10 +30,14 @@ export const site = {
     "デザインから実装・公開まで、通して担当します。表示が速く、動きにも意味のあるWebサイトをつくります。",
   heroCta: "制作実績を見る",
   heroSubCta: "相談する",
+  /* Accessible name of the works index at the foot of the hero. */
+  heroIndexLabel: "制作実績の目次",
   works: {
     label: "Selected Works",
     heading: "制作実績",
     note: "いずれも架空のブランドを題材にした自主制作です。企画・デザイン・実装まで一人で担当しました。",
+    /* Label of the close-up under each screenshot. */
+    detailLabel: "見どころ",
   },
   services: {
     label: "Services",
@@ -63,7 +71,7 @@ export const site = {
   contact: {
     label: "Contact",
     heading: "まだ形になっていない段階でも、ご相談ください。",
-    body: "このページをご覧になったサービス（クラウドワークス・ランサーズ・ココナラ）のメッセージから、お気軽にご連絡ください。作品のソースコードは GitHub で公開しています。",
+    body: "このページをご覧になったサービスのメッセージから、お気軽にご連絡ください。作品のソースコードは GitHub で公開しています。",
     cta: "GitHub を見る",
     /* Public profile instead of a mailbox: nothing personal to expose,
        and the link can never go stale the way an unowned domain could. */
@@ -77,10 +85,23 @@ export const site = {
 
 export type WorkLink = { label: string; href: string };
 
+/* A close-up of one part of the site, shown under the main screenshot. */
+export type WorkDetail = {
+  title: string;
+  body: string;
+  image: StaticImageData;
+  alt: string;
+};
+
 export type Work = {
   slug: string;
   title: string;
   kind: string;
+  /* Short trade label for the works index in the hero. */
+  field: string;
+  /* Shorter name for the works index, when the full title would wrap on
+     a 360px phone (two index columns of about 120px each). */
+  indexTitle?: string;
   year: string;
   summary: string;
   points: string[];
@@ -92,6 +113,7 @@ export type Work = {
   status?: string;
   desktop: StaticImageData;
   mobile: StaticImageData;
+  detail: WorkDetail;
 };
 
 export const works: Work[] = [
@@ -99,6 +121,7 @@ export const works: Work[] = [
     slug: "kario-tsukishiro",
     title: "菓寮 月白",
     kind: "和菓子店のブランドサイト",
+    field: "和菓子店",
     year: "2026",
     summary: "二十四節気にあわせて菓子が替わる小さな店。縦書きの見出しと夜の月で、店の静かな空気を伝えます。",
     points: [
@@ -114,11 +137,18 @@ export const works: Work[] = [
     ],
     desktop: karioDesktop,
     mobile: karioMobile,
+    detail: {
+      title: "今日の暦",
+      body: "開いた日の日付から、二十四節気と今宵の月を計算して表示します。主役の菓子も、この暦の季節に合わせて入れ替わります。",
+      image: karioDetail,
+      alt: "菓寮 月白の「今日の暦」。節気の名前と月のかたち、一年の目盛りが並んでいる",
+    },
   },
   {
     slug: "tokiwa-seiko",
     title: "常盤精工",
     kind: "精密部品加工会社のコーポレートサイト",
+    field: "精密部品加工",
     year: "2026",
     summary: "町工場の「図面どおりにつくる力」を、製図の線と表題欄をモチーフにした画面で見せます。",
     points: [
@@ -134,16 +164,23 @@ export const works: Work[] = [
     ],
     desktop: tokiwaDesktop,
     mobile: tokiwaMobile,
+    detail: {
+      title: "加工範囲の比較図",
+      body: "4台の加工機に載る大きさを、同じ縮尺の SVG で並べました。A4用紙を物差しにして、手元の部品が載るかどうかを見比べられます。",
+      image: tokiwaDetail,
+      alt: "常盤精工の加工範囲の比較図。加工機に載る大きさが、A4用紙と同じ縮尺で描かれている",
+    },
   },
   {
     slug: "yuyado-yamagasumi",
     title: "湯宿 山霞",
     kind: "温泉旅館のサイト",
+    field: "温泉旅館",
     year: "2026",
     summary: "霞のかかる谷の宿。流れる霞と湯面の揺らぎを、ブラウザの中でリアルタイムに描いています。",
     points: [
       "Three.js を使わず、WebGL2 と GLSL のシェーダーで霞と湯面を描画",
-      "写真を使う版と、描画だけで見せる版の2種類を制作",
+      "到着から出発までの滞在の流れを、夕暮れから夜明けへ移る空の色で案内",
       "動きを減らす設定の人には、静止した画面で表示",
     ],
     tech: ["React 19", "Vite", "WebGL2", "GLSL", "Vitest"],
@@ -155,24 +192,40 @@ export const works: Work[] = [
     ],
     desktop: yuyadoDesktop,
     mobile: yuyadoMobile,
+    detail: {
+      title: "月見の湯",
+      body: "湯面に映る月と灯りを、GLSL のシェーダーで描いています。カーソルや指でなぞると波が立ち、映った月が揺れて崩れます。",
+      image: yuyadoDetail,
+      alt: "湯宿 山霞の月見の湯。暗い湯面に、月と灯りが揺れながら映っている",
+    },
   },
   {
     slug: "nagino",
     title: "NAGINO都市環境技研",
     kind: "都市環境エンジニアリング企業のLP",
+    field: "環境エンジニアリング",
+    indexTitle: "NAGINO",
     year: "2026",
     summary: "建物の排熱を街のエネルギーに変える会社。取引先と採用候補者の両方に向けた1ページです。",
     points: [
       "フレームワークを使わない、素の HTML・CSS・JavaScript",
+      "熱の流れを3つの段階に切り替えて見られる循環図（SVG）",
       "OS の設定に合わせて切り替わるダークモード",
-      "技術・プロジェクト・採用・お知らせまでを1ページに整理",
     ],
-    tech: ["HTML", "CSS", "JavaScript"],
-    url: "nagino — 公開準備中",
-    links: [],
-    status: "公開準備中",
+    tech: ["HTML", "CSS", "JavaScript", "SVG"],
+    url: "niwatory11.github.io/nagino-urban-climate",
+    links: [
+      { label: "サイトを見る", href: "https://niwatory11.github.io/nagino-urban-climate/" },
+      { label: "GitHub", href: "https://github.com/niwatory11/nagino-urban-climate" },
+    ],
     desktop: naginoDesktop,
     mobile: naginoMobile,
+    detail: {
+      title: "ある街区の一日",
+      body: "昼に余る熱と、夜に足りない熱。事業の内容を1枚のグラフで説明しています。線と面は SVG、文字は HTML で重ねているので、スマホの幅でも文字が小さくなりません。",
+      image: naginoDetail,
+      alt: "NAGINOのグラフ「ある街区の一日」。昼に余る排熱と、夜に足りない熱需要の2本の曲線が描かれている",
+    },
   },
 ];
 

@@ -1,4 +1,4 @@
-import { site } from "../../data/site";
+import { site, works } from "../../data/site";
 
 /* The name is announced once on the <h1>; the split letters are decorative. */
 const heroName = site.nameLines.join(" ");
@@ -10,11 +10,14 @@ const heroName = site.nameLines.join(" ");
  * reveal: every line is its own overflow-hidden mask the letters rise out of,
  * and every letter is inline-block so transforms apply.
  * Text elements: role, name, call sign, lead, CTA pair (works + contact).
+ * At the foot of the hero a works index lists every project by number,
+ * name and trade (an instrument's channel list), so the first screen
+ * already says what was built; each entry jumps to its case study.
  */
 export default function Hero() {
   return (
-    <section className="relative flex min-h-[100dvh] flex-col justify-center px-5 pt-16 sm:px-8 lg:px-16">
-      <div className="mx-auto w-full max-w-[1400px]">
+    <section className="relative flex min-h-[100dvh] flex-col px-5 pt-16 sm:px-8 lg:px-16">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center py-8 sm:py-10">
         <p
           data-hero-fade
           className="font-mono text-[13px] uppercase tracking-[0.22em] text-accent"
@@ -76,6 +79,35 @@ export default function Hero() {
           </a>
         </div>
       </div>
+
+      <nav
+        aria-label={site.heroIndexLabel}
+        data-hero-fade
+        className="mx-auto w-full max-w-[1400px] pb-5 sm:pb-7"
+      >
+        <ol className="grid grid-cols-2 gap-x-5 border-t border-line lg:grid-cols-4 lg:gap-x-10">
+          {works.map((work, index) => (
+            <li key={work.slug}>
+              <a
+                href={`#work-${work.slug}`}
+                className="group flex h-full items-baseline gap-3 py-3.5 lg:py-5"
+              >
+                <span className="font-mono text-[11px] tracking-[0.16em] text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[13px] font-bold leading-[1.5] tracking-[0.02em] text-fg/90 transition-colors group-hover:text-accent sm:text-sm">
+                    {work.indexTitle ?? work.title}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] leading-[1.6] text-muted sm:text-xs">
+                    {work.field}
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
     </section>
   );
 }
