@@ -26,9 +26,47 @@ export default function MotionOrchestrator() {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const lenis = new Lenis({ lerp: 0.12, anchors: true });
+      const lenis = new Lenis({ lerp: 0.12 });
       /* Marker used by tests and CSS to detect that Lenis drives scroll. */
       document.documentElement.dataset.lenis = "on";
+
+      /*
+       * In-page links are scrolled here rather than by Lenis' `anchors`
+       * option, so the destination can be rounded to a whole pixel.
+       * Lenis ends a lerp scroll once Math.round(value) equals
+       * Math.round(target). Section tops sit on half pixels at some widths,
+       * and a target ending in .5 is approached from below without ever
+       * rounding up — the scroll only "ends" about 5s later, when the float
+       * finally converges. Until then Lenis keeps writing its own position
+       * every frame, so Home / End / PageDown and the scrollbar snap back,
+       * and the next jump is measured from a stale position. A whole-pixel
+       * target ends as soon as the page is within half a pixel of it.
+       *
+       * The click is not cancelled: the browser still updates the URL hash
+       * and moves the keyboard's starting point to the target.
+       */
+      const onAnchorClick = (event: MouseEvent) => {
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link =
+          event.target instanceof Element
+            ? event.target.closest<HTMLAnchorElement>("a[href]")
+            : null;
+        if (
+          !link?.hash ||
+          link.host !== window.location.host ||
+          link.pathname !== window.location.pathname
+        ) {
+          return;
+        }
+        const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        if (!target) return;
+        const margin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+        lenis.scrollTo(
+          Math.round(target.getBoundingClientRect().top + window.scrollY - margin),
+        );
+      };
+      document.addEventListener("click", onAnchorClick);
 
       lenis.on("scroll", () => {
         interaction.progress = lenis.progress || 0;
@@ -122,6 +160,7 @@ export default function MotionOrchestrator() {
           tween.kill();
         });
         gsap.ticker.remove(tick);
+        document.removeEventListener("click", onAnchorClick);
         lenis.destroy();
         delete document.documentElement.dataset.lenis;
         interaction.progress = 0;
