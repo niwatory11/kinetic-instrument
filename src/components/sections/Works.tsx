@@ -11,8 +11,7 @@ import SectionHeading from "../SectionHeading";
  *  - text:   what the site is, what was built, the stack and the links.
  *  - detail: a close-up of one crafted part of the site with a short note,
  *    so a visitor sees more than the first screen without leaving the page.
- *    (No deep link: three of the sites render on the client, so a URL with
- *    a #section opens them at the top, not at the section.)
+ *    The note ends with a link that opens the live site at that section.
  * On lg+ the detail sits under the visual and the text spans both rows;
  * below lg the DOM order (visual, text, detail) is the reading order.
  */
@@ -129,6 +128,10 @@ function WorkText({ work, index, className }: { work: Work; index: number; class
  * beside it carries the label. Image and note sit side by side and are
  * bottom-aligned so the note reads as a caption; they stack on phones and
  * again at lg, where the two-column row leaves the note too narrow a slot.
+ *
+ * The four links share one visible label, so each carries a screen-reader
+ * suffix naming the site and the part. The suffix comes after the visible
+ * text, which keeps that text at the start of the accessible name.
  */
 function WorkDetail({ work, className }: { work: Work; className: string }) {
   const { detail } = work;
@@ -151,6 +154,20 @@ function WorkDetail({ work, className }: { work: Work; className: string }) {
         </p>
         <h4 className="mt-3 text-[17px] font-bold leading-[1.5] tracking-[0.02em]">{detail.title}</h4>
         <p className="mt-2 text-sm leading-[1.85] text-muted">{detail.body}</p>
+        <p className="mt-4">
+          <a
+            href={detail.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 border-b border-line py-1 text-sm text-fg/85 transition-colors hover:border-accent hover:text-accent"
+          >
+            {site.works.detailLinkLabel}
+            <span aria-hidden="true">↗</span>
+            <span className="sr-only">
+              （{work.title}の「{detail.title}」を新しいタブで開きます）
+            </span>
+          </a>
+        </p>
       </figcaption>
     </figure>
   );

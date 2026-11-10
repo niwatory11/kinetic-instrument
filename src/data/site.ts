@@ -38,6 +38,8 @@ export const site = {
     note: "いずれも架空のブランドを題材にした自主制作です。企画・デザイン・実装まで一人で担当しました。",
     /* Label of the close-up under each screenshot. */
     detailLabel: "見どころ",
+    /* Visible text of the link from a close-up to that part of the live site. */
+    detailLinkLabel: "この部分を見る",
   },
   services: {
     label: "Services",
@@ -91,6 +93,8 @@ export type WorkDetail = {
   body: string;
   image: StaticImageData;
   alt: string;
+  /* The live site's URL with the #id of the section that holds this part. */
+  href: string;
 };
 
 export type Work = {
@@ -142,6 +146,7 @@ export const works: Work[] = [
       body: "開いた日の日付から、二十四節気と今宵の月を計算して表示します。主役の菓子も、この暦の季節に合わせて入れ替わります。",
       image: karioDetail,
       alt: "菓寮 月白の「今日の暦」。節気の名前と月のかたち、一年の目盛りが並んでいる",
+      href: "https://niwatory11.github.io/kario-tsukishiro/#collection",
     },
   },
   {
@@ -169,6 +174,7 @@ export const works: Work[] = [
       body: "4台の加工機に載る大きさを、同じ縮尺の SVG で並べました。A4用紙を物差しにして、手元の部品が載るかどうかを見比べられます。",
       image: tokiwaDetail,
       alt: "常盤精工の加工範囲の比較図。加工機に載る大きさが、A4用紙と同じ縮尺で描かれている",
+      href: "https://niwatory11.github.io/tokiwa-seiko/#equipment",
     },
   },
   {
@@ -197,6 +203,7 @@ export const works: Work[] = [
       body: "湯面に映る月と灯りを、GLSL のシェーダーで描いています。カーソルや指でなぞると波が立ち、映った月が揺れて崩れます。",
       image: yuyadoDetail,
       alt: "湯宿 山霞の月見の湯。暗い湯面に、月と灯りが揺れながら映っている",
+      href: "https://niwatory11.github.io/yuyado-yamagasumi-photo/#bath",
     },
   },
   {
@@ -225,6 +232,7 @@ export const works: Work[] = [
       body: "昼に余る熱と、夜に足りない熱。事業の内容を1枚のグラフで説明しています。線と面は SVG、文字は HTML で重ねているので、スマホの幅でも文字が小さくなりません。",
       image: naginoDetail,
       alt: "NAGINOのグラフ「ある街区の一日」。昼に余る排熱と、夜に足りない熱需要の2本の曲線が描かれている",
+      href: "https://niwatory11.github.io/nagino-urban-climate/#mission-title",
     },
   },
 ];
